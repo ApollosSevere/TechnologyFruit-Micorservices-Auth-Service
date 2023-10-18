@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: AUTH-SERVICE
+  config:
+    import: optional:configserver:http://${INTERNAL_URL:localhost}:9296
+  datasource:
+    username: AXS1QFH
+    password: 123456
+    url: jdbc:postgresql://${INTERNAL_URL:localhost}:5432/jwt_security
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#  security:
+#    user:
+##      password: 123456
+#      name: apollos
+
+application:
+  security:
+    jwt:
+      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      expiration: 86400000 # a day
+      refresh-token:
+        expiration: 604800000 # 7 days
+
+server:
+  port: 8086
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}
+
+
+
+
