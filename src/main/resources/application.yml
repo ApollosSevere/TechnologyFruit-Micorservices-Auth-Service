@@ -2,11 +2,15 @@ spring:
   application:
     name: AUTH-SERVICE
   config:
-    import: optional:configserver:http://${INTERNAL_URL:localhost}:9296
+    import: configserver:${CONFIG_SERVER_ADDRESS:http://localhost:9296}
   datasource:
-    username: AXS1QFH
-    password: 123456
-    url: jdbc:postgresql://${INTERNAL_URL:localhost}:5432/jwt_security
+#    username: AXS1QFH
+#    password: 123456
+#    url: jdbc:postgresql://${INTERNAL_URL:localhost}:5432/jwt_security
+    username: ${DB_USERNAME:AXS1QFH}
+    password: ${DB_PASSWORD:123456}
+    url: ${DB_HOST:jdbc:postgresql://${INTERNAL_URL:localhost}:5432/jwt_security}
+#    url: jdbc:postgresql://jwtsecurity.cknism0rgni6.us-east-1.rds.amazonaws.com:5432/jwtsecurity
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -17,10 +21,7 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-#  security:
-#    user:
-##      password: 123456
-#      name: apollos
+
 
 application:
   security:
@@ -29,6 +30,7 @@ application:
       expiration: 86400000 # a day
       refresh-token:
         expiration: 604800000 # 7 days
+
 
 server:
   port: 8086

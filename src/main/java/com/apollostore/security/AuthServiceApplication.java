@@ -3,6 +3,9 @@ package com.apollostore.security;
 import com.apollostore.security.auth.AuthenticationService;
 import com.apollostore.security.payload.request.RegisterRequest;
 import com.apollostore.security.user.Role;
+
+import io.awspring.cloud.jdbc.config.annotation.RdsInstanceConfigurer;
+import io.awspring.cloud.jdbc.datasource.TomcatJdbcDataSourceFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,10 +20,20 @@ public class AuthServiceApplication {
 		SpringApplication.run(AuthServiceApplication.class, args);
 	}
 
+//	@Bean
+//	public RdsInstanceConfigurer instanceConfigurer() {
+//		return ()-> {
+//			TomcatJdbcDataSourceFactory dataSourceFactory =
+//					new TomcatJdbcDataSourceFactory();
+//			dataSourceFactory.setInitialSize(10);
+//			dataSourceFactory.setValidationQuery("SELECT 1 FROM DUAL");
+//			return dataSourceFactory;
+//		};
+//	}
+
 	@Bean
 	public CommandLineRunner commandLineRunner(
-			AuthenticationService service
-	) {
+			AuthenticationService service) {
 		return args -> {
 			var admin = RegisterRequest.builder()
 					.firstname("Admin")

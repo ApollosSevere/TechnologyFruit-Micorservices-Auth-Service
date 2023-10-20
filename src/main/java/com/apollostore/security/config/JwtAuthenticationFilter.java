@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,29 +30,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       @NonNull HttpServletRequest request,
       @NonNull HttpServletResponse response,
-      @NonNull FilterChain filterChain
-  ) throws ServletException, IOException {
-    System.out.println("FRIST CHECK ------->>>> " );
-    if (request.getServletPath().contains("/api/v1/auth")
-            && !request.getServletPath().contains("/api/v1/auth/demo-controller")
-            && !request.getServletPath().contains("/api/v1/auth/validateToken")
-    )
+      @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-    {
-      System.out.println("DOING NOTHING BECAUSE PATH CONTAINS 'api/v1/auth' ------->>>> " );
+    System.out.println("FRIST CHECK ------->>>> ");
+
+    if (request.getServletPath().contains("/api/v1/auth")
+        && !request.getServletPath().contains("/api/v1/auth/demo-controller")
+        && !request.getServletPath().contains("/api/v1/auth/validateToken")) {
+      System.out.println("DOING NOTHING BECAUSE PATH CONTAINS 'api/v1/auth' ------->>>> ");
+
       filterChain.doFilter(request, response);
       return;
     }
-    System.out.println("TAKING CARE OF BUSNESS!! ------->>>> " );
-    final String authHeader = request.getHeader("Authorization");
+
+    System.out.println("TAKING CARE OF BUSNESS!! ------->>>> ");
+
     final String jwt;
     final String userEmail;
-    if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+    final String authHeader = request.getHeader("Authorization");
+
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       filterChain.doFilter(request, response);
       return;
     }
+
     jwt = authHeader.substring(7);
     userEmail = jwtService.extractUsername(jwt);
+
     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
       var isTokenValid = tokenRepository.findByToken(jwt)
@@ -61,20 +64,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           .orElse(false);
 
       System.out.println("SETTING isTokenValid ------->>>> " + isTokenValid);
+
       if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
             userDetails,
             null,
-            userDetails.getAuthorities()
-        );
+            userDetails.getAuthorities());
         /*
-        * I think what below is saying is that if the token is legit --> then,
-        * set the security context for the whole sub app */
+         * I think what below is saying is that if the token is legit --> then,
+         * set the security context for the whole sub app
+         */
         authToken.setDetails(
-            new WebAuthenticationDetailsSource().buildDetails(request)
-        );
+            new WebAuthenticationDetailsSource().buildDetails(request));
 
         System.out.println("SETTING SecurityContextHolder ------------------->>>>>>>>>>>>");
+
         SecurityContextHolder.getContext().setAuthentication(authToken);
       }
     }
