@@ -4,6 +4,7 @@ spring:
   config:
     import: configserver:${CONFIG_SERVER_ADDRESS:http://localhost:9296}
 
+
   datasource:
 #    username: AXS1QFH
 #    password: 123456
