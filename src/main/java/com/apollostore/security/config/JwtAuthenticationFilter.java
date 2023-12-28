@@ -36,14 +36,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     if (request.getServletPath().contains("/api/v1/auth")
         && !request.getServletPath().contains("/api/v1/auth/demo-controller")
-        && !request.getServletPath().contains("/api/v1/auth/validateToken")) {
+//        && !request.getServletPath().contains("/api/v1/auth/validateToken")
+    ) {
       System.out.println("DOING NOTHING BECAUSE PATH CONTAINS 'api/v1/auth' ------->>>> ");
 
       filterChain.doFilter(request, response);
       return;
     }
 
-    System.out.println("TAKING CARE OF BUSNESS!! ------->>>> ");
+//    System.out.println("TAKING CARE OF BUSNESS!! ------->>>> ", );
 
     final String jwt;
     final String userEmail;

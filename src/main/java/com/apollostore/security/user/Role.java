@@ -47,6 +47,18 @@ public enum Role {
           )
   ),
 
+  TEACHER(Set.of(
+          Permission.ADMIN_READ,
+          Permission.ADMIN_UPDATE,
+          Permission.ADMIN_DELETE,
+          Permission.ADMIN_CREATE,
+          Permission.MANAGER_READ,
+          Permission.MANAGER_UPDATE,
+          Permission.MANAGER_DELETE,
+          Permission.MANAGER_CREATE
+    )
+  )
+
   ;
 
   @Getter

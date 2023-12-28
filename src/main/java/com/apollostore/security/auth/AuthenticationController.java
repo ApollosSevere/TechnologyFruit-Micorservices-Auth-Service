@@ -30,13 +30,17 @@ public class AuthenticationController {
   public ResponseEntity<AuthenticationResponse> login(
       @RequestBody AuthenticationRequest request
   ) {
-    return ResponseEntity.ok(service.authenticate(request));
+    AuthenticationResponse result = service.authenticate(request);
+    System.out.println("AuthenticationResponse!!!!: " + result);
+    return ResponseEntity.ok(result);
+//    return ResponseEntity.ok(service.authenticate(request));
   }
 
   @GetMapping("/validateToken")
   public ResponseEntity<ConnValidationResponse> validateToken(
           @RequestHeader(HttpHeaders.AUTHORIZATION) String tokenToValidate
   ) {
+    System.out.println("AUTHHHHHH ---->>>> " + tokenToValidate);
     return ResponseEntity.ok(service.validateToken(tokenToValidate));
   }
 

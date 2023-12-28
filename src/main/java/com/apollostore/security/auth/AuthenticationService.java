@@ -32,27 +32,48 @@ public class AuthenticationService {
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
 
+
+  public String generateToken(User user) {
+    Map<String, Object> extraClaims = new HashMap<>();
+    extraClaims.put("role", user.getRole());
+    extraClaims.put("authorities", user.getRole().getPermissions());
+
+    return jwtService.generateToken(extraClaims,user);
+  }
+
+  public AuthenticationResponse buildResponse (String accessToken, String refreshToken, User user) {
+    return AuthenticationResponse.builder()
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .uuid(user.getId())
+            .email(user.getEmail())
+            .firstname(user.getFirstName())
+            .lastname(user.getLastName())
+            .role(user.getRole())
+            .permissions(user.getRole().getPermissions())
+            .build();
+  }
+
   public AuthenticationResponse register(RegisterRequest request) {
     var user = User.builder()
-        .firstname(request.getFirstname())
-        .lastname(request.getLastname())
+        .firstName(request.getFirstName())
+        .lastName(request.getLastName())
         .email(request.getEmail())
         .password(passwordEncoder.encode(request.getPassword()))
         .role(request.getRole())
         .build();
+
     var savedUser = repository.save(user);
-    Map<String, Object> extraClaims = new HashMap<>();
-    extraClaims.put("role", user.getRole());
-    extraClaims.put("authorities", user.getRole().getPermissions());
-    var jwtToken = jwtService.generateToken(extraClaims,user);
-    System.out.println(jwtToken);
+
+    var jwtToken = generateToken(user);
+//    TODO: update generateToken() to account for generateRefreshToken
     var refreshToken = jwtService.generateRefreshToken(user);
+
     saveUserToken(savedUser, jwtToken);
-    return AuthenticationResponse.builder()
-        .accessToken(jwtToken)
-            .refreshToken(refreshToken)
-        .build();
+
+    return buildResponse(jwtToken,refreshToken, savedUser);
   }
+
 
   public AuthenticationResponse authenticate(AuthenticationRequest request) {
     authenticationManager.authenticate(
@@ -63,14 +84,15 @@ public class AuthenticationService {
     );
     var user = repository.findByEmail(request.getEmail())
         .orElseThrow();
-    var jwtToken = jwtService.generateToken(user);
+
+    var jwtToken = generateToken(user);
+//    TODO: update generateToken() to account for generateRefreshToken
     var refreshToken = jwtService.generateRefreshToken(user);
+
     revokeAllUserTokens(user);
     saveUserToken(user, jwtToken);
-    return AuthenticationResponse.builder()
-        .accessToken(jwtToken)
-            .refreshToken(refreshToken)
-        .build();
+
+    return buildResponse(jwtToken, refreshToken, user);
   }
 
   private void saveUserToken(User user, String jwtToken) {
@@ -124,7 +146,8 @@ public class AuthenticationService {
   }
 
   public ConnValidationResponse validateToken(String tokenToValidate) {
-    Optional<Token> potentialToken = tokenRepository.findByToken(tokenToValidate.replace("Bearer ", ""));
+    String formattedToken = tokenToValidate.replace("Bearer ", "");
+    Optional<Token> potentialToken = tokenRepository.findByToken(formattedToken);
 
     System.out.println("IS TOKEN HERE?!?! " + tokenToValidate);
     System.out.println("POTENTIAL TOKEN PRESENT? " + potentialToken.isPresent());
@@ -137,13 +160,21 @@ public class AuthenticationService {
 
     if (isValidToken) {
       User user = potentialToken.get().user;
+      String refreshToken = jwtService.generateRefreshToken(user);
 
       return ConnValidationResponse.builder()
               .status(null)
               .isAuthenticated(true)
               .username(user.getUsername())
               .token(tokenToValidate)
+              .accessToken(formattedToken)
+              .refreshToken(refreshToken)
+              .uuid(user.getId())
+              .email(user.getEmail())
+              .firstname(user.getFirstName())
+              .lastname(user.getLastName())
               .role(user.getRole())
+              .permissions(user.getRole().getPermissions())
               .authorities(user.getRole().getAuthorities())
               .build();
     } else {
