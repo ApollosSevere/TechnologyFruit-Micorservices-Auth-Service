@@ -21,16 +21,15 @@ public class LogoutService implements LogoutHandler {
       HttpServletResponse response,
       Authentication authentication
   ) {
-    System.out.println("LOGGGGINNNN OUTTTTTTTTT");
-    final String authHeader = request.getHeader("Authorization");
     final String jwt;
-    if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-      System.out.println("Wrong Spot!!" + authHeader);
-      return;
-    }
+    final String authHeader = request.getHeader("Authorization");
+
+    if (authHeader == null ||!authHeader.startsWith("Bearer ")) return;
     jwt = authHeader.substring(7);
+
     var storedToken = tokenRepository.findByToken(jwt)
         .orElse(null);
+
     if (storedToken != null) {
       System.out.println("RIGHT Spot!!");
       storedToken.setExpired(true);

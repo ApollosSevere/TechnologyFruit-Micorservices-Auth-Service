@@ -18,10 +18,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class ConnValidationResponse {
     private String status;
-    /* If the person is not authenticated anymore --> like if the token expires
-    *  then send isAuthenticated = false which should cause the person to be logged out
-    *  in the FE
-    *  */
     private boolean isAuthenticated;
     private String username;
     private String token;

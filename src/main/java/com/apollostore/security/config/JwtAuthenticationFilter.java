@@ -32,19 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-    System.out.println("FRIST CHECK ------->>>> ");
 
     if (request.getServletPath().contains("/api/v1/auth")
         && !request.getServletPath().contains("/api/v1/auth/demo-controller")
-//        && !request.getServletPath().contains("/api/v1/auth/validateToken")
     ) {
-      System.out.println("DOING NOTHING BECAUSE PATH CONTAINS 'api/v1/auth' ------->>>> ");
-
       filterChain.doFilter(request, response);
       return;
     }
-
-//    System.out.println("TAKING CARE OF BUSNESS!! ------->>>> ", );
 
     final String jwt;
     final String userEmail;
@@ -64,21 +58,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           .map(t -> !t.isExpired() && !t.isRevoked())
           .orElse(false);
 
-      System.out.println("SETTING isTokenValid ------->>>> " + isTokenValid);
 
       if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
             userDetails,
             null,
             userDetails.getAuthorities());
-        /*
-         * I think what below is saying is that if the token is legit --> then,
-         * set the security context for the whole sub app
-         */
+
         authToken.setDetails(
             new WebAuthenticationDetailsSource().buildDetails(request));
 
-        System.out.println("SETTING SecurityContextHolder ------------------->>>>>>>>>>>>");
 
         SecurityContextHolder.getContext().setAuthentication(authToken);
       }

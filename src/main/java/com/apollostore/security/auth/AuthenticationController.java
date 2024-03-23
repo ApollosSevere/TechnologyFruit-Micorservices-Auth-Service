@@ -33,7 +33,6 @@ public class AuthenticationController {
     AuthenticationResponse result = service.authenticate(request);
     System.out.println("AuthenticationResponse!!!!: " + result);
     return ResponseEntity.ok(result);
-//    return ResponseEntity.ok(service.authenticate(request));
   }
 
   @GetMapping("/validateToken")
@@ -51,6 +50,7 @@ public class AuthenticationController {
   ) throws IOException {
     service.refreshToken(request, response);
   }
+
 // For Demo Purposes
   @GetMapping("/demo-controller")
   public ResponseEntity<String> sayHello() {

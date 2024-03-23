@@ -149,13 +149,6 @@ public class AuthenticationService {
     String formattedToken = tokenToValidate.replace("Bearer ", "");
     Optional<Token> potentialToken = tokenRepository.findByToken(formattedToken);
 
-    System.out.println("IS TOKEN HERE?!?! " + tokenToValidate);
-    System.out.println("POTENTIAL TOKEN PRESENT? " + potentialToken.isPresent());
-
-//    boolean isValidToken = potentialToken
-//            .map(t -> !t.isExpired() && !t.isRevoked())
-//            .orElse(false);
-
     boolean isValidToken = potentialToken.isPresent() && !potentialToken.get().expired && !potentialToken.get().isRevoked();
 
     if (isValidToken) {
